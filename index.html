@@ -450,10 +450,15 @@ function generatePDF() {
   const grand = belt + trip + minC + ot + prime;
 
   // === HEADER BAR (white with black border) ===
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, pw, 38, 'F');
   doc.setDrawColor(25, 25, 25);
   doc.setLineWidth(0.8);
-  doc.setFillColor(255, 255, 255);
-  doc.rect(0, 0, pw, 38, 'FD');
+  // Draw borders individually so they're all equally visible
+  doc.line(ml, 0.5, pw - mr, 0.5);       // top
+  doc.line(ml, 38, pw - mr, 38);          // bottom
+  doc.line(ml, 0, ml, 38);               // left
+  doc.line(pw - mr, 0, pw - mr, 38);     // right
 
   // Logo in header
   try {
