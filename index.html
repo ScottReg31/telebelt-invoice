@@ -449,10 +449,10 @@ function generatePDF() {
   const prime = num('primeQty') * num('primeAmt');
   const grand = belt + trip + minC + ot + prime;
 
-  // === HEADER BAR (white with black border) ===
+  // === HEADER BAR (light gray with black border) ===
   doc.setDrawColor(25, 25, 25);
   doc.setLineWidth(0.8);
-  doc.setFillColor(255, 255, 255);
+  doc.setFillColor(235, 235, 235);
   doc.rect(0, 0, pw, 38, 'FD');
 
   // Logo in header (smaller to fit envelope window)
