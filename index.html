@@ -455,7 +455,9 @@ function generatePDF() {
   doc.setFillColor(235, 235, 235);
   doc.rect(0, 0, pw, 38, 'FD');
 
-  // Logo in header (smaller to fit envelope window)
+  // Logo in header — fill behind with matching gray to hide white JPEG background
+  doc.setFillColor(235, 235, 235);
+  doc.rect(ml, 7, 20, 20, 'F');
   try {
     doc.addImage(LOGO_DATA_URL, 'JPEG', ml, 7, 20, 20, undefined, 'FAST');
   } catch(e) {}
