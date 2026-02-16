@@ -150,35 +150,35 @@ input[type=number] { -moz-appearance: textfield; }
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-gray-200">
-              <th class="text-left py-2 pr-4 font-semibold text-gray-600 w-1/4">Item</th>
-              <th class="text-left py-2 pr-4 font-semibold text-gray-600 w-1/4">Quantity</th>
-              <th class="text-left py-2 pr-4 font-semibold text-gray-600 w-1/4">Rate</th>
-              <th class="text-right py-2 font-semibold text-gray-600 w-1/4">Total</th>
+              <th class="text-left py-2 font-semibold text-gray-600" style="width:25%">Item</th>
+              <th class="text-left py-2 pl-1 font-semibold text-gray-600" style="width:25%">Quantity</th>
+              <th class="text-left py-2 pl-2 font-semibold text-gray-600" style="width:25%">Rate</th>
+              <th class="text-right py-2 font-semibold text-gray-600" style="width:25%">Total</th>
             </tr>
           </thead>
           <tbody>
             <tr class="border-b border-gray-100">
               <td class="py-3 pr-4 font-medium">Belting (Hours)</td>
-              <td class="py-3 pr-4"><input type="number" step="any" id="beltHrs" oninput="calc()" placeholder="0" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"> <span class="text-xs text-gray-400">hrs</span></td>
-              <td class="py-3 pr-4"><div class="flex items-center gap-1">$<input type="number" step="any" id="beltRate" oninput="calc()" placeholder="0.00" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"><span class="text-xs text-gray-400">/hr</span></div></td>
+              <td class="py-3 pr-4"><input type="number" step="any" id="beltHrs" oninput="calc()" placeholder="0" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"> <span class="text-xs text-gray-400">Hrs</span></td>
+              <td class="py-3 pr-4"><div class="flex items-center gap-1">$<input type="number" step="any" id="beltRate" oninput="calc()" placeholder="0.00" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"><span class="text-xs text-gray-400">/Hr</span></div></td>
               <td class="py-3 text-right font-semibold" id="beltTotal">$0.00</td>
             </tr>
             <tr class="border-b border-gray-100">
               <td class="py-3 pr-4 font-medium">Trip Charge</td>
-              <td class="py-3 pr-4"><input type="number" step="any" id="tripHrs" oninput="calc()" placeholder="0" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"> <span class="text-xs text-gray-400">hrs</span></td>
-              <td class="py-3 pr-4"><div class="flex items-center gap-1">$<input type="number" step="any" id="tripRate" oninput="calc()" placeholder="0.00" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"><span class="text-xs text-gray-400">/hr</span></div></td>
+              <td class="py-3 pr-4"><input type="number" step="any" id="tripHrs" oninput="calc()" placeholder="0" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"> <span class="text-xs text-gray-400">Hrs</span></td>
+              <td class="py-3 pr-4"><div class="flex items-center gap-1">$<input type="number" step="any" id="tripRate" oninput="calc()" placeholder="0.00" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"><span class="text-xs text-gray-400">/Hr</span></div></td>
               <td class="py-3 text-right font-semibold" id="tripTotal">$0.00</td>
             </tr>
             <tr class="border-b border-gray-100">
               <td class="py-3 pr-4 font-medium">Minimum Charge</td>
-              <td class="py-3 pr-4"><input type="number" step="any" id="minHrs" oninput="calc()" placeholder="0" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"> <span class="text-xs text-gray-400">hrs</span></td>
-              <td class="py-3 pr-4"><div class="flex items-center gap-1">$<input type="number" step="any" id="minRate" oninput="calc()" placeholder="0.00" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"><span class="text-xs text-gray-400">/hr</span></div></td>
+              <td class="py-3 pr-4"><input type="number" step="any" id="minHrs" oninput="calc()" placeholder="0" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"> <span class="text-xs text-gray-400">Hrs</span></td>
+              <td class="py-3 pr-4"><div class="flex items-center gap-1">$<input type="number" step="any" id="minRate" oninput="calc()" placeholder="0.00" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"><span class="text-xs text-gray-400">/Hr</span></div></td>
               <td class="py-3 text-right font-semibold" id="minTotal">$0.00</td>
             </tr>
             <tr class="border-b border-gray-100">
               <td class="py-3 pr-4 font-medium">Overtime</td>
-              <td class="py-3 pr-4"><input type="number" step="any" id="otHrs" oninput="calc()" placeholder="0" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"> <span class="text-xs text-gray-400">hrs</span></td>
-              <td class="py-3 pr-4"><div class="flex items-center gap-1">$<input type="number" step="any" id="otRate" oninput="calc()" placeholder="0.00" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"><span class="text-xs text-gray-400">/hr</span></div></td>
+              <td class="py-3 pr-4"><input type="number" step="any" id="otHrs" oninput="calc()" placeholder="0" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"> <span class="text-xs text-gray-400">Hrs</span></td>
+              <td class="py-3 pr-4"><div class="flex items-center gap-1">$<input type="number" step="any" id="otRate" oninput="calc()" placeholder="0.00" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"><span class="text-xs text-gray-400">/Hr</span></div></td>
               <td class="py-3 text-right font-semibold" id="otTotal">$0.00</td>
             </tr>
             <tr class="border-b border-gray-100">
