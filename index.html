@@ -455,19 +455,19 @@ function generatePDF() {
   doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, pw, 38, 'FD');
 
-  // Logo in header
+  // Logo in header (smaller to fit envelope window)
   try {
-    doc.addImage(LOGO_DATA_URL, 'JPEG', ml, 5, 28, 28, undefined, 'FAST');
+    doc.addImage(LOGO_DATA_URL, 'JPEG', ml, 7, 20, 20, undefined, 'FAST');
   } catch(e) {}
 
-  // Company name in header
+  // Company name in header (sized to fit top envelope window ~80mm wide)
   doc.setTextColor(25, 25, 25);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.text('WICKS CONSTRUCTION, INC.', ml + 34, 17);
+  doc.setFontSize(12);
+  doc.text('WICKS CONSTRUCTION, INC.', ml + 24, 16);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text('PO Box 428  \u2022  Decorah, IA 52101  \u2022  (563) 382-2325', ml + 34, 25);
+  doc.setFontSize(7);
+  doc.text('PO Box 428  \u2022  Decorah, IA 52101  \u2022  (563) 382-2325', ml + 24, 22);
 
   // INVOICE label on right
   doc.setFont('helvetica', 'bold');
