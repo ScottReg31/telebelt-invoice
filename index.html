@@ -564,7 +564,7 @@ function generatePDF() {
       cellPadding: { top: 4, bottom: 4, left: 4, right: 4 }
     },
     columnStyles: {
-      0: { cellWidth: 55, fontStyle: 'bold' },
+      0: { cellWidth: 55, fontStyle: 'bold', halign: 'left' },
       1: { cellWidth: 35, halign: 'center' },
       2: { cellWidth: 40, halign: 'center' },
       3: { cellWidth: 40, halign: 'right', fontStyle: 'bold' }
@@ -572,6 +572,13 @@ function generatePDF() {
     margin: { left: ml, right: mr },
     tableLineColor: [230, 230, 230],
     tableLineWidth: 0.2,
+    didParseCell: function(data) {
+      // Align headers to match their column alignment
+      if (data.section === 'head') {
+        if (data.column.index === 1 || data.column.index === 2) data.cell.styles.halign = 'center';
+        if (data.column.index === 3) data.cell.styles.halign = 'right';
+      }
+    },
     didDrawCell: function(data) {
       if (data.section === 'body') {
         // Draw bottom border on each row
