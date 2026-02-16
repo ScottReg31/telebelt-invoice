@@ -194,8 +194,11 @@ input[type=number] { -moz-appearance: textfield; }
       </div>
     </div>
 
-    <!-- Generate -->
-    <div class="flex justify-center mb-12">
+    <!-- Actions -->
+    <div class="flex justify-center gap-4 mb-12">
+      <button onclick="resetForm()" class="bg-white text-gray-700 border border-gray-300 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-100 transition-colors shadow-sm">
+        🔄 Clear Form
+      </button>
       <button onclick="generatePDF()" class="bg-black text-white px-10 py-4 rounded-xl text-lg font-bold hover:bg-gray-800 transition-colors shadow-lg">
         📄 Generate Invoice PDF
       </button>
@@ -371,6 +374,19 @@ function toggleManualEntry() {
   }
 }
 
+function resetForm() {
+  if (!confirm('Clear all form fields?')) return;
+  ['invoiceNumber','invoiceDate','serviceDate','custName','custAddress','custCity','custState','custZip',
+   'jobAddress','operator','description','yardsBelted',
+   'beltHrs','beltRate','tripHrs','tripRate','minHrs','minRate','otHrs','otRate','primeQty','primeAmt'
+  ].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('customerDropdown').value = '';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('invoiceDate').value = today;
+  document.getElementById('serviceDate').value = today;
+  calc();
+}
+
 function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
 function fmt(n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
@@ -391,70 +407,25 @@ function calc() {
 function generatePDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'letter');
-  const pw = 215.9; // letter width mm
+  const pw = 215.9;
+  const ph = 279.4;
+  const ml = 20; // margin left
+  const mr = 20; // margin right
+  const cw = pw - ml - mr; // content width
 
-  // Company header
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('WICKS CONSTRUCTION INC.', 20, 22);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.text('PO BOX 428', 20, 28);
-  doc.text('DECORAH, IA 52101', 20, 33);
-  doc.setFontSize(8);
-  doc.text('Ph-(563) 382-2325', 20, 40);
-  doc.text('Fax-(563) 382-5339', 20, 45);
-
-  // INVOICE title
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(28);
-  doc.setTextColor(180, 0, 0);
-  doc.text('INVOICE', pw - 20, 22, { align: 'right' });
-  doc.setTextColor(0, 0, 0);
-
-  // Date & Invoice # box
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
   const invDate = document.getElementById('invoiceDate').value || '';
   const invNum = document.getElementById('invoiceNumber').value || '';
-  doc.setDrawColor(150);
-  doc.rect(pw - 80, 28, 60, 16);
-  doc.text('Date:', pw - 78, 34);
-  doc.text(invDate, pw - 50, 34);
-  doc.text('Invoice Number:', pw - 78, 41);
-  doc.text(invNum, pw - 44, 41);
-
-  // Logo
-  try {
-    doc.addImage(LOGO_DATA_URL, 'JPEG', pw - 55, 48, 20, 20, undefined, 'FAST');
-  } catch(e) {}
-
-  // Customer address block
+  const svcDate = document.getElementById('serviceDate').value || invDate;
   const custName = document.getElementById('custName').value;
   const custAddr = document.getElementById('custAddress').value;
   const custCity = document.getElementById('custCity').value;
   const custState = document.getElementById('custState').value;
   const custZip = document.getElementById('custZip').value;
-
-  doc.setDrawColor(0);
-  doc.setLineWidth(0.3);
-  let cy = 56;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text(custName, 20, cy);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  if (custAddr) { cy += 5; doc.text(custAddr, 20, cy); }
-  const cityLine = [custCity, custState].filter(Boolean).join(', ') + (custZip ? '  ' + custZip : '');
-  if (cityLine.trim()) { cy += 5; doc.text(cityLine, 20, cy); }
-
-  // Table
-  const svcDate = document.getElementById('serviceDate').value || invDate;
   const desc = document.getElementById('description').value || 'Material Placement';
   const yards = num('yardsBelted');
+  const opName = document.getElementById('operator').value;
+  const jobAddr = document.getElementById('jobAddress').value;
 
-  // Build line items
-  const lines = [];
   const belt = num('beltHrs') * num('beltRate');
   const trip = num('tripHrs') * num('tripRate');
   const minC = num('minHrs') * num('minRate');
@@ -462,59 +433,186 @@ function generatePDF() {
   const prime = num('primeQty') * num('primeAmt');
   const grand = belt + trip + minC + ot + prime;
 
-  // Main description line
-  let mainDesc = desc;
-  if (yards > 0) mainDesc += ' (' + yards + ' yds)';
-  lines.push([svcDate, mainDesc, fmt(grand)]);
+  // === DARK HEADER BAR ===
+  doc.setFillColor(25, 25, 25);
+  doc.rect(0, 0, pw, 38, 'F');
 
-  // Breakdown lines (smaller, indented)
-  const breakdown = [];
-  if (belt > 0) breakdown.push('    Belting: ' + num('beltHrs') + ' hrs @ ' + fmt(num('beltRate')) + '/hr = ' + fmt(belt));
-  if (trip > 0) breakdown.push('    Trip Charge: ' + num('tripHrs') + ' hrs @ ' + fmt(num('tripRate')) + '/hr = ' + fmt(trip));
-  if (minC > 0) breakdown.push('    Minimum Charge: ' + num('minHrs') + ' hrs @ ' + fmt(num('minRate')) + '/hr = ' + fmt(minC));
-  if (ot > 0) breakdown.push('    Overtime: ' + num('otHrs') + ' hrs @ ' + fmt(num('otRate')) + '/hr = ' + fmt(ot));
-  if (prime > 0) breakdown.push('    Prime Charge: ' + num('primeQty') + ' x ' + fmt(num('primeAmt')) + ' = ' + fmt(prime));
+  // Logo in header
+  try {
+    doc.addImage(LOGO_DATA_URL, 'JPEG', ml, 5, 28, 28, undefined, 'FAST');
+  } catch(e) {}
 
-  breakdown.forEach(b => lines.push(['', b, '']));
+  // Company name in header
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text('WICKS CONSTRUCTION INC.', ml + 34, 17);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text('CONCRETE AND MATERIAL PLACEMENT', ml + 34, 23);
+  doc.text('PO Box 428  •  Decorah, IA 52101  •  (563) 382-2325', ml + 34, 29);
+
+  // INVOICE label on right
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(28);
+  doc.text('INVOICE', pw - mr, 22, { align: 'right' });
+  doc.setTextColor(0, 0, 0);
+
+  // === INVOICE META (right side) ===
+  let y = 48;
+  const metaX = pw - mr - 60;
+  doc.setFillColor(245, 245, 245);
+  doc.roundedRect(metaX, 42, 60, 28, 2, 2, 'F');
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Invoice Number', metaX + 4, y);
+  doc.text('Invoice Date', metaX + 4, y + 8);
+  doc.text('Service Date', metaX + 4, y + 16);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(0, 0, 0);
+  doc.text(invNum, metaX + 56, y, { align: 'right' });
+  doc.text(invDate, metaX + 56, y + 8, { align: 'right' });
+  doc.text(svcDate, metaX + 56, y + 16, { align: 'right' });
+
+  // === BILL TO (left side) ===
+  y = 46;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(120, 120, 120);
+  doc.text('BILL TO', ml, y);
+
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+  doc.text(custName || '—', ml, y);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  if (custAddr) { y += 5; doc.text(custAddr, ml, y); }
+  const cityLine = [custCity, custState].filter(Boolean).join(', ') + (custZip ? '  ' + custZip : '');
+  if (cityLine.trim()) { y += 5; doc.text(cityLine, ml, y); }
+
+  // === JOB INFO ===
+  y = 78;
+  doc.setDrawColor(230, 230, 230);
+  doc.setLineWidth(0.3);
+  doc.line(ml, y, pw - mr, y);
+  y += 7;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(120, 120, 120);
+  if (jobAddr) { doc.text('Job Location: ', ml, y); doc.setTextColor(0,0,0); doc.text(jobAddr, ml + 22, y); doc.setTextColor(120,120,120); }
+  if (opName) { doc.text('Operator: ', ml + 90, y); doc.setTextColor(0,0,0); doc.text(opName, ml + 106, y); doc.setTextColor(120,120,120); }
+  if (yards > 0) { doc.text('Yards Belted: ', ml + 145, y); doc.setTextColor(0,0,0); doc.text(yards.toString(), ml + 166, y); }
+
+  // === LINE ITEMS TABLE ===
+  y += 8;
+  const lineItems = [];
+  if (belt > 0) lineItems.push(['Belting', num('beltHrs') + ' hrs', fmt(num('beltRate')) + '/hr', fmt(belt)]);
+  if (trip > 0) lineItems.push(['Trip Charge', num('tripHrs') + ' hrs', fmt(num('tripRate')) + '/hr', fmt(trip)]);
+  if (minC > 0) lineItems.push(['Minimum Charge', num('minHrs') + ' hrs', fmt(num('minRate')) + '/hr', fmt(minC)]);
+  if (ot > 0) lineItems.push(['Overtime', num('otHrs') + ' hrs', fmt(num('otRate')) + '/hr', fmt(ot)]);
+  if (prime > 0) lineItems.push(['Prime Charge', num('primeQty').toString(), fmt(num('primeAmt')), fmt(prime)]);
+
+  // Add description as first row context
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(desc, ml, y + 2);
+  y += 6;
 
   doc.autoTable({
-    startY: cy + 10,
-    head: [['DATE', 'DESCRIPTION', 'AMOUNT']],
-    body: lines,
-    theme: 'grid',
-    headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 9 },
-    bodyStyles: { fontSize: 8 },
-    columnStyles: {
-      0: { cellWidth: 25 },
-      1: { cellWidth: 120 },
-      2: { cellWidth: 30, halign: 'right' }
+    startY: y,
+    head: [['Service', 'Quantity', 'Rate', 'Amount']],
+    body: lineItems,
+    theme: 'plain',
+    headStyles: {
+      fillColor: [250, 250, 250],
+      textColor: [100, 100, 100],
+      fontStyle: 'bold',
+      fontSize: 8,
+      cellPadding: { top: 3, bottom: 3, left: 4, right: 4 }
     },
-    margin: { left: 20, right: 20 },
-    didParseCell: function(data) {
-      // Make breakdown lines smaller and gray
-      if (data.section === 'body' && data.row.index > 0) {
-        data.cell.styles.fontSize = 7;
-        data.cell.styles.textColor = [100, 100, 100];
+    bodyStyles: {
+      fontSize: 9,
+      textColor: [30, 30, 30],
+      cellPadding: { top: 4, bottom: 4, left: 4, right: 4 }
+    },
+    columnStyles: {
+      0: { cellWidth: 55, fontStyle: 'bold' },
+      1: { cellWidth: 35, halign: 'center' },
+      2: { cellWidth: 40, halign: 'center' },
+      3: { cellWidth: 40, halign: 'right', fontStyle: 'bold' }
+    },
+    margin: { left: ml, right: mr },
+    tableLineColor: [230, 230, 230],
+    tableLineWidth: 0.2,
+    didDrawCell: function(data) {
+      if (data.section === 'body') {
+        // Draw bottom border on each row
+        doc.setDrawColor(240, 240, 240);
+        doc.setLineWidth(0.2);
+        doc.line(data.cell.x, data.cell.y + data.cell.height, data.cell.x + data.cell.width, data.cell.y + data.cell.height);
       }
     }
   });
 
-  const finalY = doc.lastAutoTable.finalY + 15;
+  let finalY = doc.lastAutoTable.finalY + 5;
 
-  // Thank you
-  doc.setFont('helvetica', 'bolditalic');
-  doc.setFontSize(12);
-  doc.text('Thank you for your business!', pw / 2, finalY, { align: 'center' });
+  // === TOTAL SECTION ===
+  // Subtotal line
+  const totalBoxX = pw - mr - 70;
+  doc.setDrawColor(230, 230, 230);
+  doc.setLineWidth(0.3);
+  doc.line(totalBoxX, finalY, pw - mr, finalY);
 
-  // Total
+  finalY += 7;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  doc.text('Subtotal', totalBoxX, finalY);
+  doc.setTextColor(0, 0, 0);
+  doc.text(fmt(grand), pw - mr, finalY, { align: 'right' });
+
+  // Grand total with dark background
+  finalY += 5;
+  doc.setFillColor(25, 25, 25);
+  doc.roundedRect(totalBoxX - 2, finalY, 72, 12, 1, 1, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text('TOTAL', pw - 60, finalY + 15);
-  doc.text(fmt(grand), pw - 20, finalY + 15, { align: 'right' });
+  doc.setFontSize(12);
+  doc.setTextColor(255, 255, 255);
+  doc.text('TOTAL DUE', totalBoxX + 2, finalY + 8);
+  doc.text(fmt(grand), pw - mr - 2, finalY + 8, { align: 'right' });
+  doc.setTextColor(0, 0, 0);
 
-  // Draw line above total
-  doc.setLineWidth(0.5);
-  doc.line(pw - 65, finalY + 10, pw - 20, finalY + 10);
+  // === FOOTER ===
+  // Thank you message
+  finalY += 25;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(11);
+  doc.setTextColor(80, 80, 80);
+  doc.text('Thank you for your business!', ml, finalY);
+
+  // Payment info
+  finalY += 10;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(140, 140, 140);
+  doc.text('Please make checks payable to Wicks Construction Inc.', ml, finalY);
+  doc.text('PO Box 428, Decorah, IA 52101', ml, finalY + 4);
+
+  // Bottom bar
+  doc.setFillColor(25, 25, 25);
+  doc.rect(0, ph - 8, pw, 8, 'F');
+  doc.setFontSize(7);
+  doc.setTextColor(180, 180, 180);
+  doc.text('Wicks Construction Inc.  •  Concrete and Material Placement  •  (563) 382-2325', pw / 2, ph - 3, { align: 'center' });
 
   // Save
   const filename = 'Invoice_' + (invNum || 'draft') + '_' + (custName || 'customer').replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
