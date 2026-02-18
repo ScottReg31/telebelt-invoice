@@ -83,7 +83,10 @@ input[type=number] { -moz-appearance: textfield; }
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Date of Service</label>
-          <input type="date" id="serviceDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm">
+          <div class="flex gap-1 items-center">
+            <input type="date" id="serviceDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm">
+            <button id="clearServiceDate" onclick="document.getElementById('serviceDate').value=''" class="text-gray-400 hover:text-red-500 text-lg px-1 hidden" title="Clear date">&times;</button>
+          </div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Due Date</label>
@@ -286,6 +289,12 @@ function setMode(mode) {
   document.getElementById('wicksBilling').classList.toggle('hidden', mode !== 'wicks');
   document.getElementById('operatorField').classList.toggle('hidden', mode !== 'telebelt');
   document.getElementById('yardsField').classList.toggle('hidden', mode !== 'telebelt');
+  document.getElementById('clearServiceDate').classList.toggle('hidden', mode === 'telebelt');
+  if (mode !== 'telebelt') {
+    document.getElementById('serviceDate').value = '';
+  } else if (!document.getElementById('serviceDate').value) {
+    document.getElementById('serviceDate').value = new Date().toISOString().split('T')[0];
+  }
   // Clear billing fields on switch
   if (mode === 'telebelt') {
     clearWicksBilling();
