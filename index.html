@@ -562,7 +562,7 @@ function generatePDF() {
 
   const invDate = document.getElementById('invoiceDate').value || '';
   const invNum = document.getElementById('invoiceNumber').value || '';
-  const svcDate = document.getElementById('serviceDate').value || invDate;
+  const svcDate = document.getElementById('serviceDate').value || (invoiceMode === 'telebelt' ? invDate : '');
   const dueDate = document.getElementById('dueDate').value || '';
   const custName = document.getElementById('custName').value;
   const custAddr = document.getElementById('custAddress').value;
@@ -676,7 +676,7 @@ function generatePDF() {
   doc.setFontSize(8);
   let jx = ml;
   doc.setTextColor(120, 120, 120);
-  doc.text('Service Date: ', jx, y); doc.setTextColor(0,0,0); doc.text(fmtDate(svcDate), jx + 22, y); jx += 50; doc.setTextColor(120,120,120);
+  if (svcDate) { doc.text('Service Date: ', jx, y); doc.setTextColor(0,0,0); doc.text(fmtDate(svcDate), jx + 22, y); jx += 50; doc.setTextColor(120,120,120); }
   if (jobAddr) { doc.text('Job Location: ', jx, y); doc.setTextColor(0,0,0); doc.text(jobAddr, jx + 22, y); jx += 55; doc.setTextColor(120,120,120); }
   if (opName) { doc.text('Operator: ', jx, y); doc.setTextColor(0,0,0); doc.text(opName, jx + 16, y); jx += 40; doc.setTextColor(120,120,120); }
   if (yards > 0) { doc.text('Yards: ', jx, y); doc.setTextColor(0,0,0); doc.text(yards.toString(), jx + 11, y); }
