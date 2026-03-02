@@ -689,10 +689,10 @@ function generatePDF() {
   doc.setFontSize(8);
   let jx = ml;
   doc.setTextColor(120, 120, 120);
-  if (svcDate) { doc.text('Service Date: ', jx, y); doc.setTextColor(0,0,0); doc.text(fmtDate(svcDate), jx + 22, y); jx += 50; doc.setTextColor(120,120,120); }
-  if (jobAddr) { doc.text('Job Location: ', jx, y); doc.setTextColor(0,0,0); doc.text(jobAddr, jx + 22, y); jx += 55; doc.setTextColor(120,120,120); }
-  if (opName) { doc.text('Operator: ', jx, y); doc.setTextColor(0,0,0); doc.text(opName, jx + 16, y); jx += 40; doc.setTextColor(120,120,120); }
-  if (yards > 0) { doc.text('Yards: ', jx, y); doc.setTextColor(0,0,0); doc.text(yards.toString(), jx + 11, y); }
+  if (svcDate) { const lbl='Service Date: '; doc.text(lbl, jx, y); doc.setTextColor(0,0,0); const val=fmtDate(svcDate); doc.text(val, jx + doc.getTextWidth(lbl), y); jx += doc.getTextWidth(lbl) + doc.getTextWidth(val) + 6; doc.setTextColor(120,120,120); }
+  if (jobAddr) { const lbl='Job Location: '; doc.text(lbl, jx, y); doc.setTextColor(0,0,0); doc.text(jobAddr, jx + doc.getTextWidth(lbl), y); jx += doc.getTextWidth(lbl) + doc.getTextWidth(jobAddr) + 6; doc.setTextColor(120,120,120); }
+  if (opName) { const lbl='Operator: '; doc.text(lbl, jx, y); doc.setTextColor(0,0,0); const val=opName; doc.text(val, jx + doc.getTextWidth(lbl), y); jx += doc.getTextWidth(lbl) + doc.getTextWidth(val) + 6; doc.setTextColor(120,120,120); }
+  if (yards > 0) { const lbl='Yards: '; doc.text(lbl, jx, y); doc.setTextColor(0,0,0); doc.text(yards.toString(), jx + doc.getTextWidth(lbl), y); }
 
   // === LINE ITEMS TABLE ===
   y += 8;
